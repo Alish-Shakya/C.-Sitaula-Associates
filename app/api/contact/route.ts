@@ -2,7 +2,7 @@ import { contactFormSchema } from "@/lib/contact";
 
 export const runtime = "edge";
 
-const inboxAddress = process.env.CONTACT_EMAIL_TO ?? "alishshakya44@gmail.com";
+const inboxAddress = process.env.CONTACT_EMAIL_TO ?? "csitaula@gmail.com";
 
 export async function POST(request: Request) {
   try {
