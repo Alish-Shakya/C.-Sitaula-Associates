@@ -18,7 +18,7 @@ const highlights = [
     icon: Target,
     title: "Growth-Focused",
     description:
-      "We go beyond compliance to help your business make smarter, more profitable financial decisions.",
+      "We go beyond compliance to help your business make smarter and more profitable financial decisions.",
   },
 ];
 
