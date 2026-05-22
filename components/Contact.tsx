@@ -3,19 +3,9 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { MapPin, Phone, Mail, CheckCircle2 } from "lucide-react";
+import { contactFormSchema, type ContactFormData } from "@/lib/contact";
 import { cn } from "@/lib/utils";
-
-const schema = z.object({
-  name: z.string().min(2, "Please enter your full name"),
-  phone: z.string().min(7, "Please enter a valid phone number"),
-  email: z.string().optional(),
-  service: z.string().min(1, "Please select a service"),
-  message: z.string().optional(),
-});
-
-type FormData = z.infer<typeof schema>;
 
 const services = [
   "Auditing",
@@ -42,19 +32,44 @@ const inputClass = (hasError: boolean) =>
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-  } = useForm<FormData>({ resolver: zodResolver(schema) });
+  } = useForm<ContactFormData>({ resolver: zodResolver(contactFormSchema) });
 
-  const onSubmit = async (data: FormData) => {
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    console.log("Consultation request:", data);
-    setSubmitted(true);
-    reset();
+  const onSubmit = async (data: ContactFormData) => {
+    setSubmitError(null);
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const result = (await response.json().catch(() => null)) as
+          | { message?: string }
+          | null;
+
+        throw new Error(result?.message || "Unable to send your message.");
+      }
+
+      setSubmitted(true);
+      reset();
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "Unable to send your message. Please try again."
+      );
+    }
   };
 
   return (
@@ -112,6 +127,11 @@ export default function Contact() {
               </div>
             ) : (
               <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
+                {submitError ? (
+                  <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    {submitError}
+                  </div>
+                ) : null}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
