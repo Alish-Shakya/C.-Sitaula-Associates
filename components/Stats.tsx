@@ -14,7 +14,7 @@ export default function Stats() {
               <div className="text-4xl sm:text-5xl font-extrabold text-white mb-2">
                 {stat.value}
               </div>
-              <div className="text-blue-200 text-base font-medium">{stat.label}</div>
+              <div className="text-blue-300 text-base font-medium">{stat.label}</div>
             </div>
           ))}
         </div>
